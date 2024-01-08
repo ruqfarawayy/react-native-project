@@ -17,9 +17,14 @@ interface CategoriesData {
 interface CategoriesProps {
   activeCategory: string;
   categories: CategoriesData[];
-  setActiveCategory: (category: string) => void;
+  // setActiveCategory: (category: string) => void;
+  handleCategoryChange: (category: string) => void;
 }
-const Categories = ({ activeCategory, setActiveCategory, categories }: CategoriesProps) => {
+const Categories = ({
+  activeCategory,
+  categories,
+  handleCategoryChange,
+}: CategoriesProps) => {
   return (
     <Animated.View entering={FadeInDown.duration(500).springify()}>
       <ScrollView
@@ -36,7 +41,7 @@ const Categories = ({ activeCategory, setActiveCategory, categories }: Categorie
             <TouchableOpacity
               key={item.idCategory}
               className="flex items-center space-y-1"
-              onPress={() => setActiveCategory(item.strCategory)}
+              onPress={() => handleCategoryChange(item.strCategory)}
             >
               <View className={`rounded-full p-[6px] ${activeButtonClass}`}>
                 <Image

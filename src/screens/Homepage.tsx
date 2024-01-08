@@ -16,9 +16,16 @@ import Categories from '../components/Categories';
 import axios from 'axios';
 import Recipes from '../components/Recipes';
 
-const Homepage = () => {
+const Homepage = ({ navigation }: any) => {
   const [activeCategory, setActiveCategory] = useState('Beef');
   const [categories, setCategories] = useState([]);
+  const [meals, setMeals] = useState([]);
+
+  const handleCategoryChange = (category: string) => {
+    getRecipes(category);
+    setActiveCategory(category);
+    setMeals([]);
+  };
 
   const getCategories = async () => {
     try {
@@ -34,8 +41,22 @@ const Homepage = () => {
     }
   };
 
+  const getRecipes = async (category = 'Beef') => {
+    try {
+      const response = await axios.get(
+        `https://themealdb.com/api/json/v1/1/filter.php?c=${category}`,
+      );
+      // console.log('response :', response)
+      if (response && response.data) {
+        setMeals(response.data.meals);
+      }
+    } catch (error) {
+      console.log('error :', (error as Error).message);
+    }
+  };
   useEffect(() => {
     getCategories();
+    getRecipes();
   }, []);
 
   return (
@@ -76,14 +97,14 @@ const Homepage = () => {
           </Text>
         </View>
         {/* search bar */}
-        <View className="mx-4 flex-row items-center rounded-full bg-black/5 p-[6px]">
+        <View className="mx-4 flex-row items-center rounded-full bg-black/5">
           <TextInput
             placeholder="Search any recipe"
             placeholderTextColor={'gray'}
             style={{ fontSize: hp(1.7) }}
             className="flex-1 text-base mb-1 pl-3 tracking-wider"
           />
-          <View className="bg-white rounded-full p-3">
+          <View className="bg-white rounded-full p-3 mr-1">
             <MagnifyingGlassIcon size={hp(2.5)} strokeWidth={3} color="gray" />
           </View>
         </View>
@@ -93,13 +114,17 @@ const Homepage = () => {
             <Categories
               categories={categories}
               activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
+              handleCategoryChange={handleCategoryChange}
             />
           )}
         </View>
         {/* recipes */}
         <View>
-          <Recipes />
+          <Recipes
+            categories={categories}
+            meals={meals}
+            navigation={navigation}
+          />
         </View>
       </ScrollView>
     </View>
